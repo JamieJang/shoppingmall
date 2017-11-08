@@ -1,0 +1,72 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %} LOGIN {% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="wrap">
+	
+	
+	<div class="container" style="position:absolute;  width:90%; left:5%;">
+		
+		<div style="width:100%">
+			<div class="profile" id="profile">
+				<hr>
+				<span class="fa fa-id-card-o"></span>
+				{{ prof.user.username }}<br/>
+				<hr>
+				<span class="fa fa-user"></span>
+				{{ prof.name }}<br/>
+				<hr>
+				<span class="fa fa-phone"></span>
+				{{ prof.phoneNumber }}<br/>
+				<hr>
+				<span class="fa fa-home"></span>
+				{% if not prof.zipCode == None %}{{ prof.zipCode }}{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+				{% if not prof.streetName == None %}{{ prof.streetName }}{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+				{% if not prof.detailAddress == None %}{{ prof.detailAddress }}{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+				{% if not prof.subAddress == None %}{{ prof.subAddress }}{% endif %}<br/>
+				<hr>
+				<span class="fa fa-diamond" style="color:blue" data-toggle="tooltip"
+					data-placement="left" title="LEVEL" ></span>
+				{{ prof.level }}<br/>
+				<hr>
+				<span class="fa fa-gg" style="color:gold" data-toggle="tooltip"
+					data-placement="left" title="POINT"></span>
+				{% if prof.point == None %}
+				No Point
+				{% else %}
+				{{ prof.point }}<br/>
+				{% endif %}
+				<hr>
+				<span class="fa fa-won" data-toggle="tooltip" data-placement="left" title="총구매금액"></span>
+				{% if prof.cumulativeAmount == None %}
+				No Purchase
+				{% else %}
+				{{ prof.cumulativeAmount }}<br/>
+				{% endif %}
+				<hr>
+			</div>
+		</div>
+		
+		<div style="width:100%; margin-bottom:2em; ">
+			<div class="setting_btn">
+				<div class="ch-pw">
+					<a href="{% url 'shopping:change_password' %}" class="btn btn-default" style="width:90%">비밀번호 변경</a>
+				</div>
+				<div class="ch-prof">
+					<a href="{% url 'shopping:update_profile' %}" class="btn btn-default" style="width:90%">회원정보 변경</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

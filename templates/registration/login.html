@@ -1,0 +1,23 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %} LOGIN {% endblock %}
+
+{% block content %}
+	<div class="login-form">
+		<h2 class="text-success"> LOGIN </h2>
+		<form method="post">
+			{% csrf_token %}
+			{% for field in form %}
+				<p>
+				{{ field.label }}<br/>
+				{{ field }}				
+				{% for error in field.errors %}
+				  <p style="color: red">{{ error }}</p>
+				{% endfor %}
+			  </p>
+			{% endfor %}
+			<button type="submit" class="btn btn-info">Login</button>
+		</form>
+	</div>
+{% endblock %}

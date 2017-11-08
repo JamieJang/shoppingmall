@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<meta charset='UTF-8'>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="CATE"/>
+	<meta property="og:description" content="고양이 용품 쇼핑몰"/>
+	<meta property="og:image" content="{% static 'portfolio/img/shoppingmall.png' %}"/>
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{% static 'portfolio/css/myfont.css' %}">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">	<!-- portfolio css -->
+	<link rel="stylesheet" href="{% static 'shoppingmall/css/shoppingmall.css' %}">
+	
+	<!-- sweet alert -->
+	<link rel="stylesheet" type="text/css" href="{% static 'timetable/sweetalert/dist/sweetalert.css' %}">	
+	
+	
+	
+</head>
+
+<body>
+	<div class="background hidden-xs">
+		<a href="{% url 'shopping:shop_index' %}"><p>CATÉ</p></a>
+	</div>	
+	
+	{% block header %}{% endblock %}
+
+	
+	{% block content %}{% endblock %}
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<!-- 주소검색 cdn -->	
+	<script src="//d1p7wdleee1q2z.cloudfront.net/post/search.min.js"></script>
+	
+	<!-- sweetalert -->
+	<script src="{% static 'timetable/sweetalert/dist/sweetalert.min.js' %}"></script>
+	
+	<script src="{% static 'shoppingmall/js/shoppingmall.js' %}"></script>
+	{% block javascript %}{% endblock %}
+	
+</body>
+
+</html>

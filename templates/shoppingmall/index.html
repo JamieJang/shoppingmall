@@ -1,0 +1,97 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}HOME{% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="wrap" style="height:100%;">
+	
+	<div class="item-list">
+		<div class="list-table" id="list-table">
+		{% for item in products %}
+			<div class="col-xs-6 col-sm-3" style="padding:10px">
+				<a href="{% url 'shopping:item_detail' item.pk %}" style="color:black">
+				{% if item.photo %}
+					<img src="{{ item.photo.url }}" width="80" height="80"><br/>
+				{% endif %}
+				<p>{{ item.productName }}<p>
+				<p>{{ item.price }}원</p>
+				</a>
+			</div>
+		{% endfor %}
+		</div>
+	</div>
+	
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+	var pageNum = 1;
+	var hasNextPage = true;
+
+	if( hasNextPage ){
+
+		$(window).scroll(function(){
+			var w_height = $(window).height();
+			var d_height = $(document).height();
+			var top = $(window).scrollTop();
+			if( top >= d_height - (w_height*2) ){
+				pageNum++;
+				$.ajax({
+					type:"GET",
+					url:"?page="+pageNum,
+					success:function(response){
+						if( response.msg ){
+							var item = response.object_list;
+							for( i in item ){
+								var each = item[i];
+								var div = document.createElement("div");
+								$(div).attr("class","col-xs-6 col-sm-3");
+								$(div).attr("style","padding:10px");
+								
+								var a = document.createElement("a");
+								
+								$(a).attr("href","/shopping/product/detail/"+each.id+"/");
+								$(a).attr("style","color:black");
+								
+								if( each.photo ){
+									var img = document.createElement("img");
+									$(img).attr("src", "/media/"+each.photo );
+									$(img).attr("width","80");
+									$(img).attr("height","80");
+								
+								}
+								var p = document.createElement("p");
+								var title = document.createTextNode( each.productName );
+								p.appendChild(title);							
+								var p2 = document.createElement("p");
+								title = document.createTextNode( each.price );
+								p2.appendChild(title);
+								
+								a.appendChild(img);
+								a.appendChild(p);
+								a.appendChild(p2);
+								
+								div.appendChild(a);						
+								
+								document.getElementById("list-table").appendChild(div);
+								
+							}						
+			
+						} else {
+							hasNextPage = false;
+						}
+						
+					},
+				});
+			}
+		});
+	}
+</script>
+{% endblock %}

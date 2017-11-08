@@ -1,0 +1,44 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}SignUp{% endblock %}
+
+{% block header %}
+	<nav class="navbar navbar-default" data-spy="affix" data-offset-top="400">
+		<div class="container">
+			<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target="#myNav">
+				<span class="fa fa-bars"></span>
+			</button>
+				<a class="navbar-brand" href="{% url 'shopping:shop_index' %}">
+					<span> CATÉ </span>
+				</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNav">
+				
+				<ul class="nav navbar-nav navbar-right">					
+					<li><a href="{% url 'shopping:login' %}" style="color:#C38866">LOGIN</a></li>					
+				</ul>
+			</div>
+		</div>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<div class="container signup-form">
+		<h2 class="text-success">회원가입</h2>
+		<form method="post">
+			{% csrf_token %}
+			{% for field in form %}
+			  <p>
+				{{ field }}				
+				{% for error in field.errors %}
+				  <p style="color: red">{{ error }}</p>
+				{% endfor %}
+			  </p>
+			{% endfor %}
+			<button type="submit" class="btn btn-info">Sign up</button>
+		</form>
+	</div>
+{% endblock %}

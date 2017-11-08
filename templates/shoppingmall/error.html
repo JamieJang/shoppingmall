@@ -1,0 +1,18 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}Error{% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+{% endblock %}
+
+{% block content %}
+	<div style="text-align:center">
+	<h2 style="text-align:center">{{ msg }}</h2>
+	{% if 'ID' in msg %}
+	<a class="btn btn-info" href="{% url 'shopping:login' %}"> Login again </a>
+	{% endif %}
+	</div>
+{% endblock %}

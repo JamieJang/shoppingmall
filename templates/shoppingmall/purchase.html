@@ -1,0 +1,127 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}HOME{% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+	
+{% endblock %}
+
+{% block content %}
+<div id="wrap">
+	<div class="item-list">
+		<div class="col-xs-12 col-sm-6 img-box">
+			<img src="{{ item.product.photo.url }}" width="200" height="200"><br/>
+		</div>
+		
+		<div class="col-xs-12 col-sm-6 detail-box">
+			<h2>{{ item.product.productName }}</h2>
+			<hr>
+			{% if item.product.dcprice != None %}
+				<p style="font-size:.7em;">소비자가격:<del style="color:red">{{ item.product.price }}원</del></p>
+				<p style="font-size:.7em;">판매가격: {{ item.product.dcprice }}원</p>
+			{% else %}
+				<p>판매가격: {{ item.product.price }}원</p>
+			{% endif %}
+			{% if item.product.origin != none %}
+			<p style="font-size:.7em;">원산지: {{ item.product.origin }}</p>
+			{% endif %}
+			<hr>
+			<p>구매 갯수: {{ item.quantity }}</p>
+			<hr>
+			<h2 class="text-info">TOTAL: {{ item.total_price }}</h2>
+		</div>
+		<div class="col-xs-12 col-sm-4">
+		</div>
+		
+		<div class="col-xs-12 col-sm-7" style="font-size:0.8em;">
+			<h1>배송정보</h1>
+			<hr>
+			<h3 style="margin-bottom:20px;"> 보내는사람 </h3>
+			
+			<p> 이름 </p>			
+			<input class="sname" name="sname" value="{{ customer.name }}" size="60">			
+			
+			<p>전화번호: </p>			
+			<input class="snumber" name="snumber" value="{{ customer.phoneNumber }}" size="60">
+			
+			<p>주소: </p>
+			<input class="saddress" name="saddress" 
+				value="{{ customer.zipcode }} {{ customer.streetName }} {{ customer.detailAddress }} {{ customer.subAddress }}" size="60">			
+			
+			<hr>
+			<h3 style="margin-bottom:20px"> 받는사람 </h3>
+			<p><input id="receiverCheck" type="checkbox" value=""><small>보내는 사람과 동일</small></span>
+			
+			<p> 이름 </p>			
+			<input class="rname" name="rname" size="60">
+			
+			<p>전화번호: </p>			
+			<input class="rnumber" name="rnumber" size="60">
+			
+			<p>주소: </p>			
+			<input type="hidden" class="raddress" name="raddress" size="60">
+			<input type="text" class="postcodify_postcode5" size="60">
+			<input type="text" class="postcodify_address" size="60">			
+			<input type="text" class="postcodify_extra_info" size="60">
+			<input type="text" class="postcodify_details" size="60">
+			<button type="button" id="postcodify_search_button" class="btn btn-default">검색</button><br/>			
+			<hr>
+			
+			<h3>배송시 유의사항</h3>
+			<input type="text" name="notice" size="60">
+			
+		</div>
+		<div class="col-xs-12 col-sm-1">
+		</div>
+		<div class="col-xs-12" style="margin:50px auto; text-align:center">
+			<a type="button" class="btn btn-default" style="color:red"
+				href="{% url 'shopping:cancelPurchase' item.id item.product.id %}">취소</a>
+			<button type="button" class="btn btn-default" style="color:lightblue"
+				onclick="completePurchase()">주문</button>
+		</div>
+		
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script> 
+	$(function() { $("#postcodify_search_button").postcodifyPopUp(); }); 
+	
+	var completePurchase = function(){
+		var pk = {{ item.id }};
+		$.ajax({
+			type: "POST",
+			url: "{% url 'shopping:purchase_one' %}",
+			data: {'pk':pk},
+			dataType: 'json',
+			'beforeSend':function(xhr,settings){
+				$.ajaxSettings.beforeSend(xhr,settings);
+			},
+			success: function(response){
+				if(response.msg){
+					swal({
+					title:"구매완료되었습니다",
+					text: "구매 목록을 보시겠습니까?",
+					type: "info",
+					showCancelButton:true,
+					confirmButtonColor: "#000011",
+					confirmButtonText:"구매목록",
+					cancelButtonText:"No",
+					closeOnConfirm: false,			
+				},
+				function(){
+					location.href="{% url 'shopping:purchase_list' %}";
+				});
+				}
+			}
+			
+			
+		});
+	}
+</script>
+
+{% endblock %}

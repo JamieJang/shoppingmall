@@ -1,0 +1,31 @@
+<div class="list-box">
+	<div class="category-box" id="FOOD">
+		{% for item in itemList %}
+			{% if item.0.category == menu.0 %}
+			<a href="{% url 'shopping:products_list' item.0 %}">{{ item.0 }} ( {{ item.1 }} )</a><br/>
+			{% endif %}
+		{% endfor %}
+	</div>
+
+	<div class="category-box" id="SNACK">
+		{% for item in itemList %}
+			{% if item.0.category == menu.1 %}
+			<a href="{% url 'shopping:products_list' item.0 %}">{{ item.0 }} ( {{ item.1 }} )</a><br/>
+			{% endif %}
+		{% endfor %}
+	</div>
+	<div class="category-box" id="TOY">
+		{% for item in itemList %}
+			{% if item.0.category == menu.2 %}
+			<a href="{% url 'shopping:products_list' item.0 %}">{{ item.0 }} ( {{ item.1 }} )</a><br/>
+			{% endif %}
+		{% endfor %}
+	</div>
+	<div class="category-box" id="ITEMS">
+		{% for item in itemList %}
+			{% if item.0.category == menu.3 %}
+			<a href="{% url 'shopping:products_list' item.0 %}">{{ item.0 }} ( {{ item.1 }} )</a><br/>
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>

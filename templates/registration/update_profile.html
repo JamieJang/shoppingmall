@@ -1,0 +1,54 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %} LOGIN {% endblock %}
+
+{% block content %}
+	<div class="change-form">
+		<h2 class="text-success"> 회원정보 수정 </h2>
+		<form method="post">
+			{% csrf_token %}
+			{% for field in form %}
+				<p>					
+					{% if field.label == 'PhoneNumber' %}
+						전화번호<br/>
+						<input type="text" name="phoneNumber" value="{{ prof.phoneNumber }}" maxlength="13" id="id_phoneNumber" size="30">
+					{% elif field.label == 'Email' %}
+						Email<br/>
+						<input type="email" name="email" value="{{ prof.email }}" maxlength="254" id="id_email" size="30">
+					{% elif field.label == 'Name' %}
+						이름<br/>
+						<input type="text" name="name" value="{{ prof.name }}" maxlength="20" id="id_name" size="30">				
+					{% elif field.label == 'ZipCode' %}
+						<p>주소</p>
+						<input type="text" name="zipCode" class="postcodify_postcode5" maxlength="200" id="id_zipCode"
+							placeholder="주소를 꼭 입력해주세요" size="30">
+						<button type="button" id="postcodify_search_button" class="btn btn-default">검색</button><br/>
+						
+					{% elif field.label == 'StreetName' %}
+						<input type="text" name="streetName" class="postcodify_address"  id="id_streetName" size="30"><br />
+					{% elif field.label == 'SubAddress' %}
+						<input type="text" name="subAddress" class="postcodify_extra_info" id="id_subAddress" size="30"><br />
+					{% elif field.label == 'DetailAddress' %}
+						<p>상세주소</p>
+						<input type="text" name="detailAddress" class="postcodify_details"  id="id_detailAddress" size="30"><br />					
+					{% endif %}
+					{% for error in field.errors %}
+					  <p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+			{% endfor %}
+			<br/
+			
+		</form>
+	</div>
+	<div class="change-form">
+		<button type="submit" class="btn btn-default btn-lg">Save changes</button>
+		<a type="button" class="btn btn-default btn-lg" style="color:red;"
+			href="{% url 'shopping:setting' %}">cancle</a>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+<script> $(function() { $("#postcodify_search_button").postcodifyPopUp(); }); </script>
+{% endblock %}

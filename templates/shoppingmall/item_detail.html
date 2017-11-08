@@ -1,0 +1,180 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}HOME{% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="wrap">
+	
+	<div class="item-list">
+		<div class="col-xs-12 col-sm-6 img-box">
+			<img src="{{ product.photo.url }}" width="200" height="200"><br/>
+		</div>
+		
+		<div class="col-xs-12 col-sm-6 detail-box">
+		
+			<h2>{{ product.productName }}</h2>
+			<hr>
+			{% if product.dcprice != None %}
+				<p style="font-size:.7em;">소비자가격:<del style="color:red">{{ product.price }}원</del></p>
+				<p style="font-size:.7em;">판매가격: {{ product.dcprice }}원</p>
+			{% else %}
+				<p>판매가격: {{ product.price }}원</p>
+			{% endif %}
+			{% if product.origin != none %}
+			<p style="font-size:.7em;">원산지: {{ product.origin }}</p>
+			{% endif %}
+			<hr>
+			
+			<div class="col-xs-5" id="amount" style="text-align:center;">	
+				<button type="button" class="btn btn-link" onclick="plus()">
+					<span class="fa fa-plus"></span>
+				</button>
+				<input type="text" class="quantity" name="quantity" value="1" size="1">
+				<button type="button" class="btn btn-link" onclick="minus()">
+					<span class="fa fa-minus"></span>
+				</button>
+			</div>
+			<div class="col-xs-7" style="text-align:center">
+				<div class="btn-group">
+					<button type="button" class="btn btn-default btn-lg" style="color:lightblue"
+						onclick="purchase('{{ user.id }}','{{ product.id }}')">Buy</button>
+					<button type="button" class="btn btn-default btn-lg" style="color:orange"
+						onclick="appendCart('{{ user.id }}','{{ product.id }}')">Cart</button>
+				</div>
+			</div>
+				
+		</div>
+	
+	</div>
+	
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+var plus = function(){
+	var productAmount = {{ product.totalAmount }};
+	var cur_amount = $("input.quantity").attr("value");
+	if( cur_amount >= productAmount ){
+		swal("Ovebalance","Sorry, we do not have this amount", "error");
+	}else{
+		$("input.quantity").attr("value",++cur_amount);
+	}		
+}
+	
+var minus = function(){
+	var cur_amount = $("input.quantity").attr("value");
+	if( cur_amount > 1 ){
+		$("input.quantity").attr("value",--cur_amount);
+	}
+}
+
+/********************** 카트 목록 추가 *****************************/
+var appendCart = function( upk, ppk ){
+	var user_pk = upk;
+	var product_pk = ppk;
+	var cur_amount = $("input.quantity").attr("value");
+	
+	$.ajax({
+		type: "POST",
+		url: "{% url 'shopping:appendCart' %}",
+		data:{
+			'user_pk':user_pk,
+			'product_pk':product_pk,
+			'quantity':cur_amount,
+		},
+		dataType: "json",
+		'beforeSend': function(xhr, settings) {			
+			$.ajaxSettings.beforeSend(xhr, settings);
+		},
+		success:function(response){
+			if(response.msg){
+				swal({
+					title:"추가되었습니다",
+					text: "카트 목록을 보시겠습니까?",
+					type:"info",
+					showCancelButton:true,
+					confirmButtonColor: "#000011",
+					confirmButtonText:"Cart list",
+					cancelButtonText:"No",
+					closeOnConfirm: false,			
+				},
+				function(){
+					location.href="{% url 'shopping:cartlist' %}";
+				});
+			} else {
+                                swal({
+					title:"Please login",
+					text:"Do you hava account?",
+					type:"info",
+					showCancelButton:true,
+					confirmButtonColor: "#000011",
+					confirmButtonText:"Yes, Login",
+					cancelButtonText:"No, Signup",
+					closeOnConfirm: false,
+					closeOnCancel: false,				
+				},
+				function(isConfirm){
+					if(isConfirm){
+	 					location.href="{% url 'shopping:login' %}";
+					} else {
+						location.href="{% url 'shopping:signup' %}";
+					}
+				});
+                        }                         	
+		}
+	});
+}	
+
+/********************** 상품 구매 *****************************/
+var purchase = function( upk, ppk ){
+	var cur_amount = $("input.quantity").attr("value");
+	var upk = upk; var ppk = ppk;
+	$.ajax({
+		type:"POST",
+		url: "{% url 'shopping:purchase' %}",
+		data:{
+			'user_pk':upk,
+			'product_pk':ppk,
+			'amount':cur_amount,
+		},
+		dataType: 'json',
+		'beforeSend':function(xhr,settings){
+			$.ajaxSettings.beforeSend(xhr,settings);
+		},
+		success:function(response){
+			if(response.msg){
+				var url = '/shopping/purchaseConfirm/'+response.item_pk+"/";
+				location.href= url;
+			}else{
+                                swal({
+					title:"Please login",
+					text:"Do you hava account?",
+					type:"info",
+					showCancelButton:true,
+					confirmButtonColor: "#000011",
+					confirmButtonText:"Yes, Login",
+					cancelButtonText:"No, Signup",
+					closeOnConfirm: false,
+					closeOnCancel: false,				
+				},
+				function(isConfirm){
+					if(isConfirm){
+	 					location.href="{% url 'shopping:login' %}";
+					} else {
+						location.href="{% url 'shopping:signup' %}";
+					}
+				});
+			}
+		}
+	});
+}
+
+</script>
+{% endblock %}

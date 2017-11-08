@@ -1,0 +1,246 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}HOME{% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+	
+{% endblock %}
+
+{% block content %}
+<div id="wrap">
+	
+	
+	<div class="cartlist">
+	{% for item in lists %}
+		<div class="eachlist">
+			<hr>
+			<div class="col-xs-1">
+				<button class="btn btn-link btn-sm" onclick="deleteItem('{{ item.pk }}',this)">
+					<span class="fa fa-close text-info"></span>
+				</button>
+			</div>
+			<div class="col-xs-2">
+				<img src="{{ item.product.photo.url }}">
+			</div>
+			<div class="col-xs-4">
+				<a href="{% url 'shopping:item_detail' item.product.pk %}">
+					<p class="cartItemName">{{ item.product.productName }}</p></a>
+			</div>
+			<div class="col-xs-4">
+				<button type="button" class="btn btn-link btn-xs" 
+					onclick="plus('{{ item.product.totalAmount }}','{{item.product.price}}','{{item.product.dcprice}}', this)">
+					<span class="fa fa-plus"></span>
+				</button>
+				<input type="text" name="quantity" value="{{ item.quantity }}" size="1"
+					data-toggle="tooltip" data-placement="top" title="최대 {{ item.product.totalAmount }}">
+				<button type="button" class="btn btn-link btn-xs" onclick="minus('{{item.product.price}}','{{item.product.dcprice}}',this)">
+					<span class="fa fa-minus"></span>
+				</button>
+			</div>			
+		</div>
+		<div class="price-box" style="width:60%; text-align:right; margin:auto">
+			{% if item.product.dcprice %}
+				<p>{{ item.product.dcprice }}&nbsp;&nbsp;
+					X <span class="num text-info">{{ item.quantity }}</span>&nbsp;&nbsp;=&nbsp;&nbsp;
+					<span class="totalPrice" style="color:#510014">{{ item.total_price }}</span><span>원</span>
+				</p>
+			{% else %}
+				<p>{{ item.product.price }}
+					&nbsp;&nbsp;
+					X <span class="num text-info">{{ item.quantity }}</span>&nbsp;&nbsp;=&nbsp;&nbsp;
+					<span class="totalPrice" style="color:#510014">{{ item.total_price }}</span><span>원</span>	
+				</p>
+			{% endif %}
+		</div>
+		
+	{% endfor %}
+		<hr>
+		<div class="totalInfo">
+			<span style="font-size:1.5em">TOTAL </span><p style="font-size:1.3em"></p>
+		</div>
+		
+		<div class="purchasebtn">
+			<button type="button" class="btn btn-default btn-lg" style="color:brown" onclick="toInfoPage(this)">BUY</button>
+		</div>		
+		
+		<div class="col-xs-12 col-sm-7" style="font-size:0.8em; display:none" id="customer_info">
+			<h1>배송정보</h1>
+			<hr>
+			<h3 style="margin-bottom:20px;"> 보내는사람 </h3>
+			
+			<p> 이름 </p>			
+			<input class="sname" name="sname" value="{{ customer.name }}" size="60">			
+			
+			<p>전화번호: </p>			
+			<input class="snumber" name="snumber" value="{{ customer.phoneNumber }}" size="60">
+			
+			<p>주소: </p>
+			<input class="saddress" name="saddress" 
+				value="{{ customer.zipcode }} {{ customer.streetName }} {{ customer.detailAddress }} {{ customer.subAddress }}" size="60">			
+			
+			<hr>
+			<h3 style="margin-bottom:20px"> 받는사람 </h3>
+			<p><input id="receiverCheck" type="checkbox" value=""><small>보내는 사람과 동일</small></span>
+			
+			<p> 이름 </p>			
+			<input class="rname" name="rname" size="60">
+			
+			<p>전화번호: </p>			
+			<input class="rnumber" name="rnumber" size="60">
+			
+			<p>주소: </p>			
+			<input type="hidden" class="raddress" name="raddress" size="60">
+			<input type="text" class="postcodify_postcode5" size="60">
+			<input type="text" class="postcodify_address" size="60">			
+			<input type="text" class="postcodify_extra_info" size="60">
+			<input type="text" class="postcodify_details" size="60">
+			<button type="button" id="postcodify_search_button" class="btn btn-default">검색</button><br/>			
+			<hr>
+			
+			<h3>배송시 유의사항</h3>
+			<input type="text" name="notice" size="60">
+			
+		</div>
+		
+		<div class="col-xs-12 col-sm-1">
+		</div>
+		<div class="col-xs-12" id="infobtn" style="margin:50px auto; text-align:center; display:none">
+			<a type="button" class="btn btn-default" style="color:red"
+				href="{% url 'shopping:shop_index' %}">취소</a>
+			<button type="button" class="btn btn-default" style="color:lightblue"
+				onclick="completePurchase()">주문</button>
+		</div>
+	</div>
+	
+
+</div>
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+	/******* SEARCH ADDRESS ******/
+	$(function() { $("#postcodify_search_button").postcodifyPopUp(); });
+
+	/******* TOTAL COST *******/
+	var totalCost = function(size){
+		var total = 0;
+		var size = size;
+		
+		for(var i=0;i<size;i++){
+			var cost = $("div.price-box:eq("+i+") p span.totalPrice").html();
+			total = total + Number(cost);
+		}
+		
+		$(".totalInfo p").text( total + "원" );
+	}
+	totalCost('{{ size }}');
+
+
+	/******* PLUS QUANTITY *******/
+	var plus = function(totalAmount,price,dcprice, ele){	
+		var cur_amount = $(ele).next().attr("value");	
+		if( dcprice != 'None' ){
+			var price = Number(dcprice);
+		}else{
+			var price = Number(price);
+		}	
+		
+		if( Number(cur_amount) >= Number(totalAmount) ){
+			console.log( "cur:",cur_amount, "total:",totalAmount);
+			swal("Ovebalance","Sorry, we do not have this amount", "error");
+		}else{
+			$(ele).next().attr("value",++cur_amount);
+			var new_total = price * cur_amount;
+			$(ele).parent().parent().next().children().children("span.totalPrice").text(new_total);
+			$(ele).parent().parent().next().children().children("span.num").text(cur_amount);
+			totalCost('{{ size }}');
+		}		
+	}
+	
+	/******* MINUS QUANTITY *******/
+	var minus = function(price,dcprice,ele){
+		var cur_amount = $(ele).prev().attr("value");
+		if( dcprice != 'None' ){
+			var price = Number(dcprice);
+		}else{
+			var price = Number(price);
+		}	
+		if( Number(cur_amount) > 1 ){
+			$(ele).prev().attr("value",--cur_amount);
+			var new_total = price * cur_amount;
+			$(ele).parent().parent().next().children().children("span.totalPrice").text(new_total);
+			$(ele).parent().parent().next().children().children("span.num").text(cur_amount);
+			totalCost('{{ size }}');
+		}
+	}
+	
+	/******* DELETE ITEM *******/
+	var deleteItem = function(pk,ele){
+		var upk = {{ user.id }};
+		$.ajax({
+			type: "POST",
+			url: "{% url 'shopping:delete_item' %}",
+			data:{
+				'pk':pk,
+				'upk':upk,
+			},
+			dataType: "json",
+			'beforeSend': function(xhr, settings) {			
+				$.ajaxSettings.beforeSend(xhr, settings);
+			},
+			success:function(response){
+				if(response.msg){
+					$(ele).parent().parent().next().remove();
+					$(ele).parent().parent().remove();
+					totalCost( response.size );
+				}
+			
+			}
+		});
+	}
+	
+	/******** SHOW CUSTOMER INFO INPUT *********/
+	var toInfoPage = function(ele){
+		$(ele).css("display","none");
+		$("#customer_info").css("display","");
+		$("#infobtn").css("display","");
+	}
+	
+	
+	/****** COMPLETE PURCHASE ********/
+	var completePurchase = function(){		
+		$.ajax({
+			type: "POST",
+			url: "{% url 'shopping:purchase_cart' %}",			
+			dataType: 'json',
+			'beforeSend':function(xhr,settings){
+				$.ajaxSettings.beforeSend(xhr,settings);
+			},
+			success: function(response){
+				if(response.msg){
+					swal({
+					title:"구매완료되었습니다",
+					text: "구매 목록을 보시겠습니까?",
+					type: "info",
+					showCancelButton:true,
+					confirmButtonColor: "#000011",
+					confirmButtonText:"구매목록",
+					cancelButtonText:"No",
+					closeOnConfirm: false,			
+				},
+				function(){
+					location.href="{% url 'shopping:purchase_list' %}";
+				});
+				}
+			}
+			
+			
+		});
+	}
+</script>
+
+{% endblock %}

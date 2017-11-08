@@ -1,0 +1,51 @@
+{% extends 'shoppingmall/base.html' %}
+{% load staticfiles %}
+
+{% block title %}HOME{% endblock %}
+
+{% block header %}
+	{% include 'shoppingmall/shopNav.html' %}
+	{% include 'shoppingmall/category_list.html' %}
+	
+{% endblock %}
+
+{% block content %}
+<div id="wrap">
+	{% for num in numDistinct %}
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" href="#{{ num.0 }}">주문번호:{{ num.0 }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="text-right">TOTAL {{ num.1 }}원</i>
+					</h4>
+				</div>
+				<div id="{{ num.0 }}" class="panel-collapse collapse">
+					<div class="panel-body" style="font-size:.7em; margin-bottom:10px">
+						{% for item in purList %}
+							{% if item.purchaseNumber.number == num.0 %}
+								<div class="col-xs-1" id="purimage">
+									<img src="{{ item.product.photo.url }}">
+								</div>
+								<div class="col-xs-4">
+									<p>{{ item.product.productName }}</p>
+								</div>
+								<div class="col-xs-1">
+									<p>{{ item.quantity }}개</p>
+								</div>
+								<div class="col-xs-2">
+									<p>{{ item.total_price }}원</p>
+								</div>
+								<div class="col-xs-4">
+									<p>{{ item.purchaseNumber.created_at }}</p>
+								</div>
+							{% endif %}
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+</div>
+
+{% endblock %}
